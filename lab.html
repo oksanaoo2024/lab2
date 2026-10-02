@@ -1,0 +1,934 @@
+```html
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Університет — сутності</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2f4f7;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            border: none;
+            background-color: #dfe6e9;
+            color: #2d3436;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .tab-button:hover {
+            background-color: #b2bec3;
+        }
+
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-bottom: 15px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-button {
+            padding: 10px 18px;
+            border: none;
+            background-color: #27ae60;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .add-button:hover {
+            background-color: #219150;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            border: 1px solid #2980b9;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #eaf4fc;
+        }
+
+        /* Popup */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 500px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .cancel-button,
+        .save-button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .cancel-button {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .save-button {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Предметна область: «Університет»</h1>
+
+    <!-- ТАБИ -->
+
+    <div class="tabs">
+
+        <button class="tab-button active"
+                onclick="openTab('students', this)">
+            Студенти
+        </button>
+
+        <button class="tab-button"
+                onclick="openTab('teachers', this)">
+            Викладачі
+        </button>
+
+        <button class="tab-button"
+                onclick="openTab('subjects', this)">
+            Предмети
+        </button>
+
+    </div>
+
+
+    <!-- ================= СТУДЕНТИ ================= -->
+
+    <div id="students" class="tab-content active">
+
+        <div class="table-header">
+
+            <h2>Сутність «Студенти»</h2>
+
+            <button class="add-button"
+                    onclick="openStudentForm()">
+                + Додати студента
+            </button>
+
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ПІБ</th>
+                    <th>Дата народження</th>
+                    <th>Група</th>
+                    <th>Курс</th>
+                    <th>Спеціальність</th>
+                    <th>Середній бал</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentsTable">
+
+                <tr>
+                    <td>1</td>
+                    <td>Іваненко Олександр</td>
+                    <td>15.04.2005</td>
+                    <td>КН-21</td>
+                    <td>3</td>
+                    <td>Комп'ютерні науки</td>
+                    <td>91</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>Петренко Марія</td>
+                    <td>22.09.2005</td>
+                    <td>КН-21</td>
+                    <td>3</td>
+                    <td>Комп'ютерні науки</td>
+                    <td>95</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>Шевченко Андрій</td>
+                    <td>10.01.2006</td>
+                    <td>КН-22</td>
+                    <td>2</td>
+                    <td>Інженерія програмного забезпечення</td>
+                    <td>87</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= ВИКЛАДАЧІ ================= -->
+
+    <div id="teachers" class="tab-content">
+
+        <div class="table-header">
+
+            <h2>Сутність «Викладачі»</h2>
+
+            <button class="add-button"
+                    onclick="openTeacherForm()">
+                + Додати викладача
+            </button>
+
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ПІБ</th>
+                    <th>Посада</th>
+                    <th>Кафедра</th>
+                    <th>Предмет</th>
+                    <th>Стаж</th>
+                    <th>Ставка</th>
+                </tr>
+            </thead>
+
+            <tbody id="teachersTable">
+
+                <tr>
+                    <td>1</td>
+                    <td>Коваленко Ірина Петрівна</td>
+                    <td>Доцент</td>
+                    <td>Комп'ютерних наук</td>
+                    <td>Бази даних</td>
+                    <td>12 років</td>
+                    <td>1.0</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>Мельник Олег Васильович</td>
+                    <td>Старший викладач</td>
+                    <td>Програмування</td>
+                    <td>Вебтехнології</td>
+                    <td>8 років</td>
+                    <td>1.0</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>Бондаренко Наталія Ігорівна</td>
+                    <td>Професор</td>
+                    <td>Інформаційних систем</td>
+                    <td>Алгоритми</td>
+                    <td>20 років</td>
+                    <td>0.75</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= ПРЕДМЕТИ ================= -->
+
+    <div id="subjects" class="tab-content">
+
+        <div class="table-header">
+
+            <h2>Сутність «Предмети»</h2>
+
+            <button class="add-button"
+                    onclick="openSubjectForm()">
+                + Додати предмет
+            </button>
+
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва предмета</th>
+                    <th>Кількість годин</th>
+                    <th>Кредити ECTS</th>
+                    <th>Семестр</th>
+                    <th>Вид контролю</th>
+                    <th>Викладач</th>
+                </tr>
+            </thead>
+
+            <tbody id="subjectsTable">
+
+                <tr>
+                    <td>1</td>
+                    <td>Бази даних</td>
+                    <td>120</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>Іспит</td>
+                    <td>Коваленко І.П.</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>Вебтехнології</td>
+                    <td>90</td>
+                    <td>3</td>
+                    <td>5</td>
+                    <td>Залік</td>
+                    <td>Мельник О.В.</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>Алгоритми</td>
+                    <td>150</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>Іспит</td>
+                    <td>Бондаренко Н.І.</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ================= POPUP ================= -->
+
+<div id="modal" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="modalTitle">Додати запис</h2>
+
+        <form id="dataForm">
+
+            <div id="formFields"></div>
+
+            <div id="formError" class="error"></div>
+
+            <div class="form-buttons">
+
+                <button type="button"
+                        class="cancel-button"
+                        onclick="closeModal()">
+                    Скасувати
+                </button>
+
+                <button type="submit"
+                        class="save-button">
+                    Додати
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // Поточна сутність, для якої відкрито форму
+    let currentEntity = "";
+
+
+    // ================= ТАБИ =================
+
+    function openTab(tabName, button) {
+
+        const contents =
+            document.querySelectorAll(".tab-content");
+
+        contents.forEach(function(content) {
+            content.classList.remove("active");
+        });
+
+        const buttons =
+            document.querySelectorAll(".tab-button");
+
+        buttons.forEach(function(btn) {
+            btn.classList.remove("active");
+        });
+
+        document
+            .getElementById(tabName)
+            .classList.add("active");
+
+        button.classList.add("active");
+    }
+
+
+    // ================= ВІДКРИТТЯ ФОРМИ =================
+
+    function openStudentForm() {
+
+        currentEntity = "student";
+
+        document.getElementById("modalTitle").textContent =
+            "Додати студента";
+
+        document.getElementById("formFields").innerHTML = `
+
+            <div class="form-group">
+                <label>ПІБ</label>
+                <input type="text"
+                       name="name"
+                       placeholder="Наприклад: Іваненко Олександр">
+            </div>
+
+            <div class="form-group">
+                <label>Дата народження</label>
+                <input type="date"
+                       name="birthDate">
+            </div>
+
+            <div class="form-group">
+                <label>Група</label>
+                <input type="text"
+                       name="group"
+                       placeholder="Наприклад: КН-21">
+            </div>
+
+            <div class="form-group">
+                <label>Курс</label>
+                <input type="number"
+                       name="course"
+                       min="1"
+                       max="6"
+                       placeholder="1-6">
+            </div>
+
+            <div class="form-group">
+                <label>Спеціальність</label>
+                <input type="text"
+                       name="speciality"
+                       placeholder="Назва спеціальності">
+            </div>
+
+            <div class="form-group">
+                <label>Середній бал</label>
+                <input type="number"
+                       name="average"
+                       min="0"
+                       max="100"
+                       step="0.01"
+                       placeholder="0-100">
+            </div>
+        `;
+
+        openModal();
+    }
+
+
+    function openTeacherForm() {
+
+        currentEntity = "teacher";
+
+        document.getElementById("modalTitle").textContent =
+            "Додати викладача";
+
+        document.getElementById("formFields").innerHTML = `
+
+            <div class="form-group">
+                <label>ПІБ</label>
+                <input type="text"
+                       name="name"
+                       placeholder="ПІБ викладача">
+            </div>
+
+            <div class="form-group">
+                <label>Посада</label>
+                <input type="text"
+                       name="position"
+                       placeholder="Наприклад: Доцент">
+            </div>
+
+            <div class="form-group">
+                <label>Кафедра</label>
+                <input type="text"
+                       name="department"
+                       placeholder="Назва кафедри">
+            </div>
+
+            <div class="form-group">
+                <label>Предмет</label>
+                <input type="text"
+                       name="subject"
+                       placeholder="Назва предмета">
+            </div>
+
+            <div class="form-group">
+                <label>Стаж (років)</label>
+                <input type="number"
+                       name="experience"
+                       min="0"
+                       placeholder="Кількість років">
+            </div>
+
+            <div class="form-group">
+                <label>Ставка</label>
+                <input type="number"
+                       name="rate"
+                       min="0"
+                       max="1"
+                       step="0.25"
+                       placeholder="Наприклад: 1.0">
+            </div>
+        `;
+
+        openModal();
+    }
+
+
+    function openSubjectForm() {
+
+        currentEntity = "subject";
+
+        document.getElementById("modalTitle").textContent =
+            "Додати предмет";
+
+        document.getElementById("formFields").innerHTML = `
+
+            <div class="form-group">
+                <label>Назва предмета</label>
+                <input type="text"
+                       name="name"
+                       placeholder="Назва предмета">
+            </div>
+
+            <div class="form-group">
+                <label>Кількість годин</label>
+                <input type="number"
+                       name="hours"
+                       min="1"
+                       placeholder="Наприклад: 120">
+            </div>
+
+            <div class="form-group">
+                <label>Кредити ECTS</label>
+                <input type="number"
+                       name="ects"
+                       min="1"
+                       max="20"
+                       placeholder="Наприклад: 4">
+            </div>
+
+            <div class="form-group">
+                <label>Семестр</label>
+                <input type="number"
+                       name="semester"
+                       min="1"
+                       max="12"
+                       placeholder="1-12">
+            </div>
+
+            <div class="form-group">
+                <label>Вид контролю</label>
+
+                <select name="control">
+
+                    <option value="">
+                        Оберіть вид контролю
+                    </option>
+
+                    <option value="Іспит">
+                        Іспит
+                    </option>
+
+                    <option value="Залік">
+                        Залік
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Викладач</label>
+                <input type="text"
+                       name="teacher"
+                       placeholder="ПІБ викладача">
+            </div>
+        `;
+
+        openModal();
+    }
+
+
+    // ================= MODAL =================
+
+    function openModal() {
+
+        document
+            .getElementById("modal")
+            .classList.add("active");
+
+        document
+            .getElementById("formError")
+            .textContent = "";
+    }
+
+
+    function closeModal() {
+
+        document
+            .getElementById("modal")
+            .classList.remove("active");
+
+        document
+            .getElementById("dataForm")
+            .reset();
+
+        document
+            .getElementById("formFields")
+            .innerHTML = "";
+    }
+
+
+    // Закриття popup при натисканні
+    // за межами форми
+
+    document
+        .getElementById("modal")
+        .addEventListener("click", function(event) {
+
+            if (event.target === this) {
+                closeModal();
+            }
+
+        });
+
+
+    // ================= ВАЛІДАЦІЯ =================
+
+    function validateFields(formData) {
+
+        for (const value of formData.values()) {
+
+            if (String(value).trim() === "") {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+    }
+
+
+    // ================= ДОДАВАННЯ =================
+
+    document
+        .getElementById("dataForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const formData =
+                new FormData(this);
+
+            const error =
+                document.getElementById("formError");
+
+
+            // Перевірка заповнення
+
+            if (!validateFields(formData)) {
+
+                error.textContent =
+                    "Заповніть усі поля форми.";
+
+                return;
+            }
+
+
+            if (currentEntity === "student") {
+
+                addStudent(formData);
+
+            }
+
+            if (currentEntity === "teacher") {
+
+                addTeacher(formData);
+
+            }
+
+            if (currentEntity === "subject") {
+
+                addSubject(formData);
+
+            }
+
+            closeModal();
+
+        });
+
+
+    // ================= СТУДЕНТ =================
+
+    function addStudent(data) {
+
+        const table =
+            document.getElementById("studentsTable");
+
+        const id =
+            table.rows.length + 1;
+
+        const row =
+            table.insertRow();
+
+        row.innerHTML = `
+
+            <td>${id}</td>
+
+            <td>${data.get("name")}</td>
+
+            <td>${formatDate(data.get("birthDate"))}</td>
+
+            <td>${data.get("group")}</td>
+
+            <td>${data.get("course")}</td>
+
+            <td>${data.get("speciality")}</td>
+
+            <td>${data.get("average")}</td>
+
+        `;
+    }
+
+
+    // ================= ВИКЛАДАЧ =================
+
+    function addTeacher(data) {
+
+        const table =
+            document.getElementById("teachersTable");
+
+        const id =
+            table.rows.length + 1;
+
+        const row =
+            table.insertRow();
+
+        row.innerHTML = `
+
+            <td>${id}</td>
+
+            <td>${data.get("name")}</td>
+
+            <td>${data.get("position")}</td>
+
+            <td>${data.get("department")}</td>
+
+            <td>${data.get("subject")}</td>
+
+            <td>${data.get("experience")} років</td>
+
+            <td>${data.get("rate")}</td>
+
+        `;
+    }
+
+
+    // ================= ПРЕДМЕТ =================
+
+    function addSubject(data) {
+
+        const table =
+            document.getElementById("subjectsTable");
+
+        const id =
+            table.rows.length + 1;
+
+        const row =
+            table.insertRow();
+
+        row.innerHTML = `
+
+            <td>${id}</td>
+
+            <td>${data.get("name")}</td>
+
+            <td>${data.get("hours")}</td>
+
+            <td>${data.get("ects")}</td>
+
+            <td>${data.get("semester")}</td>
+
+            <td>${data.get("control")}</td>
+
+            <td>${data.get("teacher")}</td>
+
+        `;
+    }
+
+
+    // ================= ФОРМАТУВАННЯ ДАТИ =================
+
+    function formatDate(date) {
+
+        if (!date) {
+            return "";
+        }
+
+        const parts =
+            date.split("-");
+
+        return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    }
+
+</script>
+
+</body>
+</html>
+```
