@@ -1,0 +1,2055 @@
+```html
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Університет — база даних</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f4f7;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1300px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #dfe6e9;
+            font-size: 16px;
+        }
+
+        .tab-button.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            color: #2980b9;
+        }
+
+        .add-button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #27ae60;
+            color: white;
+            cursor: pointer;
+        }
+
+        .add-button:hover {
+            background: #219150;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            border: 1px solid #2980b9;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .editable {
+            cursor: pointer;
+        }
+
+        .editable:hover {
+            background: #fff3cd;
+        }
+
+        .edit-input {
+            width: 95%;
+            padding: 6px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+        }
+
+        .delete-button {
+            border: none;
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .delete-button:hover {
+            background: #c0392b;
+        }
+
+        /* ================= MODAL ================= */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.5);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .cancel-button,
+        .save-button {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .save-button {
+            background: #3498db;
+            color: white;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+
+        .message-modal {
+            max-width: 450px;
+        }
+
+        .message-button {
+            padding: 10px 25px;
+            border: none;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>Предметна область: «Університет»</h1>
+
+
+    <!-- ================= ТАБИ ================= -->
+
+    <div class="tabs">
+
+        <button class="tab-button active"
+                onclick="openTab('students', this)">
+            Студенти
+        </button>
+
+        <button class="tab-button"
+                onclick="openTab('teachers', this)">
+            Викладачі
+        </button>
+
+        <button class="tab-button"
+                onclick="openTab('subjects', this)">
+            Предмети
+        </button>
+
+    </div>
+
+
+    <!-- ================= СТУДЕНТИ ================= -->
+
+    <div id="students"
+         class="tab-content active">
+
+        <div class="table-header">
+
+            <h2>Сутність «Студенти»</h2>
+
+            <button class="add-button"
+                    onclick="openStudentForm()">
+                + Додати студента
+            </button>
+
+        </div>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>ПІБ</th>
+                    <th>Дата народження</th>
+                    <th>Група</th>
+                    <th>Курс</th>
+                    <th>Спеціальність</th>
+                    <th>Середній бал</th>
+                    <th>Дія</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="studentsTable"></tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= ВИКЛАДАЧІ ================= -->
+
+    <div id="teachers"
+         class="tab-content">
+
+        <div class="table-header">
+
+            <h2>Сутність «Викладачі»</h2>
+
+            <button class="add-button"
+                    onclick="openTeacherForm()">
+                + Додати викладача
+            </button>
+
+        </div>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>ПІБ</th>
+                    <th>Посада</th>
+                    <th>Кафедра</th>
+                    <th>Предмет</th>
+                    <th>Стаж</th>
+                    <th>Ставка</th>
+                    <th>Дія</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="teachersTable"></tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= ПРЕДМЕТИ ================= -->
+
+    <div id="subjects"
+         class="tab-content">
+
+        <div class="table-header">
+
+            <h2>Сутність «Предмети»</h2>
+
+            <button class="add-button"
+                    onclick="openSubjectForm()">
+                + Додати предмет
+            </button>
+
+        </div>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Назва предмета</th>
+                    <th>Кількість годин</th>
+                    <th>ECTS</th>
+                    <th>Семестр</th>
+                    <th>Вид контролю</th>
+                    <th>Викладач</th>
+                    <th>Дія</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="subjectsTable"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ================= ФОРМА ================= -->
+
+<div id="formModal"
+     class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="modalTitle">
+            Додати запис
+        </h2>
+
+        <form id="dataForm">
+
+            <div id="formFields"></div>
+
+            <div id="formError"
+                 class="error">
+            </div>
+
+            <div class="form-buttons">
+
+                <button type="button"
+                        class="cancel-button"
+                        onclick="closeFormModal()">
+                    Скасувати
+                </button>
+
+                <button type="submit"
+                        class="save-button">
+                    Зберегти
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ================= ПОВІДОМЛЕННЯ ================= -->
+
+<div id="messageModal"
+     class="modal">
+
+    <div class="modal-content message-modal">
+
+        <h2 id="messageTitle">
+            Повідомлення
+        </h2>
+
+        <p id="messageText"></p>
+
+        <button class="message-button"
+                onclick="closeMessage()">
+            Зрозуміло
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * =====================================================
+     * LOCAL STORAGE
+     * =====================================================
+     */
+
+    const STORAGE_KEY =
+        "university_database";
+
+
+    /*
+     * Початкові дані.
+     *
+     * Вони використовуються тільки якщо
+     * localStorage ще порожній.
+     */
+
+    const initialData = {
+
+        students: [
+
+            {
+                id: 1,
+                name: "Іваненко Олександр",
+                birthDate: "15.04.2005",
+                group: "КН-21",
+                course: 3,
+                speciality: "Комп'ютерні науки",
+                average: 91
+            },
+
+            {
+                id: 2,
+                name: "Петренко Марія",
+                birthDate: "22.09.2005",
+                group: "КН-21",
+                course: 3,
+                speciality: "Комп'ютерні науки",
+                average: 95
+            },
+
+            {
+                id: 3,
+                name: "Шевченко Андрій",
+                birthDate: "10.01.2006",
+                group: "КН-22",
+                course: 2,
+                speciality: "Інженерія програмного забезпечення",
+                average: 87
+            }
+
+        ],
+
+
+        teachers: [
+
+            {
+                id: 1,
+                name: "Коваленко Ірина Петрівна",
+                position: "Доцент",
+                department: "Комп'ютерних наук",
+                subjectId: 1,
+                experience: 12,
+                rate: 1
+            },
+
+            {
+                id: 2,
+                name: "Мельник Олег Васильович",
+                position: "Старший викладач",
+                department: "Програмування",
+                subjectId: 2,
+                experience: 8,
+                rate: 1
+            },
+
+            {
+                id: 3,
+                name: "Бондаренко Наталія Ігорівна",
+                position: "Професор",
+                department: "Інформаційних систем",
+                subjectId: 3,
+                experience: 20,
+                rate: 0.75
+            }
+
+        ],
+
+
+        subjects: [
+
+            {
+                id: 1,
+                name: "Бази даних",
+                hours: 120,
+                ects: 4,
+                semester: 5,
+                control: "Іспит",
+                teacherId: 1
+            },
+
+            {
+                id: 2,
+                name: "Вебтехнології",
+                hours: 90,
+                ects: 3,
+                semester: 5,
+                control: "Залік",
+                teacherId: 2
+            },
+
+            {
+                id: 3,
+                name: "Алгоритми",
+                hours: 150,
+                ects: 5,
+                semester: 4,
+                control: "Іспит",
+                teacherId: 3
+            }
+
+        ]
+
+    };
+
+
+    /*
+     * =====================================================
+     * ЗАВАНТАЖЕННЯ ДАНИХ
+     * =====================================================
+     */
+
+    let database;
+
+
+    function loadDatabase() {
+
+        const saved =
+            localStorage.getItem(STORAGE_KEY);
+
+
+        if (saved) {
+
+            database =
+                JSON.parse(saved);
+
+        } else {
+
+            database =
+                initialData;
+
+            saveDatabase();
+
+        }
+
+    }
+
+
+    /*
+     * =====================================================
+     * ЗБЕРЕЖЕННЯ
+     * =====================================================
+     */
+
+    function saveDatabase() {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(database)
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * СИНХРОНІЗАЦІЯ МІЖ ВКЛАДКАМИ
+     * =====================================================
+     *
+     * Подія storage автоматично виникає
+     * в інших вкладках цього ж браузера,
+     * коли одна вкладка змінює localStorage.
+     */
+
+    window.addEventListener(
+        "storage",
+        function(event) {
+
+            if (
+                event.key === STORAGE_KEY &&
+                event.newValue
+            ) {
+
+                database =
+                    JSON.parse(event.newValue);
+
+                renderAll();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * =====================================================
+     * ВІДОБРАЖЕННЯ ВСІХ ТАБЛИЦЬ
+     * =====================================================
+     */
+
+    function renderAll() {
+
+        renderStudents();
+
+        renderTeachers();
+
+        renderSubjects();
+
+    }
+
+
+    /*
+     * =====================================================
+     * СТУДЕНТИ
+     * =====================================================
+     */
+
+    function renderStudents() {
+
+        const table =
+            document.getElementById(
+                "studentsTable"
+            );
+
+        table.innerHTML = "";
+
+
+        database.students.forEach(
+            function(student) {
+
+                const row =
+                    document.createElement("tr");
+
+                row.dataset.id =
+                    student.id;
+
+
+                row.innerHTML = `
+
+                    <td>${student.id}</td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'students', 'name')">
+                        ${escapeHTML(student.name)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'students', 'birthDate')">
+                        ${escapeHTML(student.birthDate)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'students', 'group')">
+                        ${escapeHTML(student.group)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'students', 'course')">
+                        ${student.course}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'students', 'speciality')">
+                        ${escapeHTML(student.speciality)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'students', 'average')">
+                        ${student.average}
+                    </td>
+
+                    <td>
+                        <button
+                            class="delete-button"
+                            onclick="deleteStudent(${student.id})">
+                            ×
+                        </button>
+                    </td>
+
+                `;
+
+                table.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * ВИКЛАДАЧІ
+     * =====================================================
+     */
+
+    function renderTeachers() {
+
+        const table =
+            document.getElementById(
+                "teachersTable"
+            );
+
+        table.innerHTML = "";
+
+
+        database.teachers.forEach(
+            function(teacher) {
+
+                const row =
+                    document.createElement("tr");
+
+                row.dataset.id =
+                    teacher.id;
+
+
+                const subject =
+                    database.subjects.find(
+                        function(subject) {
+                            return subject.id ===
+                                   teacher.subjectId;
+                        }
+                    );
+
+
+                const subjectName =
+                    subject
+                        ? subject.name
+                        : "—";
+
+
+                row.innerHTML = `
+
+                    <td>${teacher.id}</td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'teachers', 'name')">
+                        ${escapeHTML(teacher.name)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'teachers', 'position')">
+                        ${escapeHTML(teacher.position)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'teachers', 'department')">
+                        ${escapeHTML(teacher.department)}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(subjectName)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'teachers', 'experience')">
+                        ${teacher.experience} років
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'teachers', 'rate')">
+                        ${teacher.rate}
+                    </td>
+
+                    <td>
+                        <button
+                            class="delete-button"
+                            onclick="deleteTeacher(${teacher.id})">
+                            ×
+                        </button>
+                    </td>
+
+                `;
+
+                table.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * ПРЕДМЕТИ
+     * =====================================================
+     */
+
+    function renderSubjects() {
+
+        const table =
+            document.getElementById(
+                "subjectsTable"
+            );
+
+        table.innerHTML = "";
+
+
+        database.subjects.forEach(
+            function(subject) {
+
+                const row =
+                    document.createElement("tr");
+
+                row.dataset.id =
+                    subject.id;
+
+
+                const teacher =
+                    database.teachers.find(
+                        function(teacher) {
+                            return teacher.id ===
+                                   subject.teacherId;
+                        }
+                    );
+
+
+                const teacherName =
+                    teacher
+                        ? teacher.name
+                        : "—";
+
+
+                row.innerHTML = `
+
+                    <td>${subject.id}</td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'subjects', 'name')">
+                        ${escapeHTML(subject.name)}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'subjects', 'hours')">
+                        ${subject.hours}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'subjects', 'ects')">
+                        ${subject.ects}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'subjects', 'semester')">
+                        ${subject.semester}
+                    </td>
+
+                    <td class="editable"
+                        onclick="editCell(this, 'subjects', 'control')">
+                        ${escapeHTML(subject.control)}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(teacherName)}
+                    </td>
+
+                    <td>
+                        <button
+                            class="delete-button"
+                            onclick="deleteSubject(${subject.id})">
+                            ×
+                        </button>
+                    </td>
+
+                `;
+
+                table.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * ТАБИ
+     * =====================================================
+     */
+
+    function openTab(tabName, button) {
+
+        document
+            .querySelectorAll(".tab-content")
+            .forEach(
+                function(content) {
+                    content.classList.remove("active");
+                }
+            );
+
+
+        document
+            .querySelectorAll(".tab-button")
+            .forEach(
+                function(button) {
+                    button.classList.remove("active");
+                }
+            );
+
+
+        document
+            .getElementById(tabName)
+            .classList.add("active");
+
+
+        button.classList.add("active");
+
+    }
+
+
+    /*
+     * =====================================================
+     * ФОРМА СТУДЕНТА
+     * =====================================================
+     */
+
+    let currentEntity = "";
+
+
+    function openStudentForm() {
+
+        currentEntity =
+            "students";
+
+
+        document
+            .getElementById("modalTitle")
+            .textContent =
+            "Додати студента";
+
+
+        document
+            .getElementById("formFields")
+            .innerHTML = `
+
+                <div class="form-group">
+
+                    <label>ПІБ</label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Дата народження</label>
+
+                    <input
+                        type="text"
+                        name="birthDate"
+                        placeholder="15.04.2005"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Група</label>
+
+                    <input
+                        type="text"
+                        name="group"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Курс</label>
+
+                    <input
+                        type="number"
+                        name="course"
+                        min="1"
+                        max="6"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Спеціальність</label>
+
+                    <input
+                        type="text"
+                        name="speciality"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Середній бал</label>
+
+                    <input
+                        type="number"
+                        name="average"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        required>
+
+                </div>
+
+            `;
+
+
+        openFormModal();
+
+    }
+
+
+    /*
+     * =====================================================
+     * ФОРМА ВИКЛАДАЧА
+     * =====================================================
+     *
+     * Тут поле "Предмет" —
+     * саме ВИПАДНИЙ СПИСОК.
+     *
+     * Його значення беруться з таблиці subjects.
+     */
+
+    function openTeacherForm() {
+
+        currentEntity =
+            "teachers";
+
+
+        document
+            .getElementById("modalTitle")
+            .textContent =
+            "Додати викладача";
+
+
+        document
+            .getElementById("formFields")
+            .innerHTML = `
+
+                <div class="form-group">
+
+                    <label>ПІБ</label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Посада</label>
+
+                    <input
+                        type="text"
+                        name="position"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Кафедра</label>
+
+                    <input
+                        type="text"
+                        name="department"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Предмет
+                    </label>
+
+                    <select
+                        name="subjectId"
+                        required>
+
+                        ${getSubjectOptions()}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Стаж (років)</label>
+
+                    <input
+                        type="number"
+                        name="experience"
+                        min="0"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Ставка</label>
+
+                    <input
+                        type="number"
+                        name="rate"
+                        min="0"
+                        max="1"
+                        step="0.25"
+                        required>
+
+                </div>
+
+            `;
+
+
+        openFormModal();
+
+    }
+
+
+    /*
+     * =====================================================
+     * ФОРМА ПРЕДМЕТА
+     * =====================================================
+     *
+     * Поле "Викладач" отримує дані
+     * безпосередньо з таблиці teachers.
+     */
+
+    function openSubjectForm() {
+
+        currentEntity =
+            "subjects";
+
+
+        document
+            .getElementById("modalTitle")
+            .textContent =
+            "Додати предмет";
+
+
+        document
+            .getElementById("formFields")
+            .innerHTML = `
+
+                <div class="form-group">
+
+                    <label>
+                        Назва предмета
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Кількість годин
+                    </label>
+
+                    <input
+                        type="number"
+                        name="hours"
+                        min="1"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Кредити ECTS
+                    </label>
+
+                    <input
+                        type="number"
+                        name="ects"
+                        min="1"
+                        max="20"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Семестр
+                    </label>
+
+                    <input
+                        type="number"
+                        name="semester"
+                        min="1"
+                        max="12"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Вид контролю
+                    </label>
+
+                    <select
+                        name="control"
+                        required>
+
+                        <option value="">
+                            Оберіть
+                        </option>
+
+                        <option value="Іспит">
+                            Іспит
+                        </option>
+
+                        <option value="Залік">
+                            Залік
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Викладач
+                    </label>
+
+                    <select
+                        name="teacherId"
+                        required>
+
+                        ${getTeacherOptions()}
+
+                    </select>
+
+                </div>
+
+            `;
+
+
+        openFormModal();
+
+    }
+
+
+    /*
+     * =====================================================
+     * СПИСОК ПРЕДМЕТІВ
+     * =====================================================
+     */
+
+    function getSubjectOptions() {
+
+        let options =
+            `<option value="">
+                Оберіть предмет
+             </option>`;
+
+
+        database.subjects.forEach(
+            function(subject) {
+
+                options += `
+
+                    <option value="${subject.id}">
+                        ${escapeHTML(subject.name)}
+                    </option>
+
+                `;
+
+            }
+        );
+
+
+        return options;
+
+    }
+
+
+    /*
+     * =====================================================
+     * СПИСОК ВИКЛАДАЧІВ
+     * =====================================================
+     */
+
+    function getTeacherOptions() {
+
+        let options =
+            `<option value="">
+                Оберіть викладача
+             </option>`;
+
+
+        database.teachers.forEach(
+            function(teacher) {
+
+                options += `
+
+                    <option value="${teacher.id}">
+                        ${escapeHTML(teacher.name)}
+                    </option>
+
+                `;
+
+            }
+        );
+
+
+        return options;
+
+    }
+
+
+    /*
+     * =====================================================
+     * ВІДКРИТТЯ / ЗАКРИТТЯ ФОРМИ
+     * =====================================================
+     */
+
+    function openFormModal() {
+
+        document
+            .getElementById("formModal")
+            .classList.add("active");
+
+    }
+
+
+    function closeFormModal() {
+
+        document
+            .getElementById("formModal")
+            .classList.remove("active");
+
+
+        document
+            .getElementById("dataForm")
+            .reset();
+
+    }
+
+
+    /*
+     * =====================================================
+     * ЗБЕРЕЖЕННЯ ФОРМИ
+     * =====================================================
+     */
+
+    document
+        .getElementById("dataForm")
+        .addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                const formData =
+                    new FormData(this);
+
+
+                if (
+                    currentEntity ===
+                    "students"
+                ) {
+
+                    addStudent(formData);
+
+                }
+
+
+                if (
+                    currentEntity ===
+                    "teachers"
+                ) {
+
+                    addTeacher(formData);
+
+                }
+
+
+                if (
+                    currentEntity ===
+                    "subjects"
+                ) {
+
+                    addSubject(formData);
+
+                }
+
+
+                closeFormModal();
+
+                saveDatabase();
+
+                renderAll();
+
+            }
+        );
+
+
+    /*
+     * =====================================================
+     * ДОДАТИ СТУДЕНТА
+     * =====================================================
+     */
+
+    function addStudent(data) {
+
+        database.students.push({
+
+            id: getNextId(
+                database.students
+            ),
+
+            name:
+                data.get("name"),
+
+            birthDate:
+                data.get("birthDate"),
+
+            group:
+                data.get("group"),
+
+            course:
+                Number(
+                    data.get("course")
+                ),
+
+            speciality:
+                data.get("speciality"),
+
+            average:
+                Number(
+                    data.get("average")
+                )
+
+        });
+
+    }
+
+
+    /*
+     * =====================================================
+     * ДОДАТИ ВИКЛАДАЧА
+     * =====================================================
+     */
+
+    function addTeacher(data) {
+
+        database.teachers.push({
+
+            id: getNextId(
+                database.teachers
+            ),
+
+            name:
+                data.get("name"),
+
+            position:
+                data.get("position"),
+
+            department:
+                data.get("department"),
+
+            subjectId:
+                Number(
+                    data.get("subjectId")
+                ),
+
+            experience:
+                Number(
+                    data.get("experience")
+                ),
+
+            rate:
+                Number(
+                    data.get("rate")
+                )
+
+        });
+
+    }
+
+
+    /*
+     * =====================================================
+     * ДОДАТИ ПРЕДМЕТ
+     * =====================================================
+     */
+
+    function addSubject(data) {
+
+        database.subjects.push({
+
+            id: getNextId(
+                database.subjects
+            ),
+
+            name:
+                data.get("name"),
+
+            hours:
+                Number(
+                    data.get("hours")
+                ),
+
+            ects:
+                Number(
+                    data.get("ects")
+                ),
+
+            semester:
+                Number(
+                    data.get("semester")
+                ),
+
+            control:
+                data.get("control"),
+
+            teacherId:
+                Number(
+                    data.get("teacherId")
+                )
+
+        });
+
+    }
+
+
+    /*
+     * =====================================================
+     * НАСТУПНИЙ ID
+     * =====================================================
+     */
+
+    function getNextId(array) {
+
+        if (array.length === 0) {
+            return 1;
+        }
+
+
+        return Math.max(
+            ...array.map(
+                function(item) {
+                    return item.id;
+                }
+            )
+        ) + 1;
+
+    }
+
+
+    /*
+     * =====================================================
+     * ВИДАЛЕННЯ СТУДЕНТА
+     * =====================================================
+     */
+
+    function deleteStudent(id) {
+
+        database.students =
+            database.students.filter(
+                function(student) {
+                    return student.id !== id;
+                }
+            );
+
+
+        saveDatabase();
+
+        renderAll();
+
+    }
+
+
+    /*
+     * =====================================================
+     * ВИДАЛЕННЯ ПРЕДМЕТА
+     * =====================================================
+     */
+
+    function deleteSubject(id) {
+
+        /*
+         * Перед видаленням предмета перевіряємо,
+         * чи викладачі посилаються на нього.
+         */
+
+        const used =
+            database.teachers.some(
+                function(teacher) {
+
+                    return teacher.subjectId === id;
+
+                }
+            );
+
+
+        if (used) {
+
+            showMessage(
+                "Видалення неможливе",
+                "Цей предмет використовується у таблиці «Викладачі». Спочатку змініть предмет у відповідного викладача."
+            );
+
+            return;
+
+        }
+
+
+        database.subjects =
+            database.subjects.filter(
+                function(subject) {
+                    return subject.id !== id;
+                }
+            );
+
+
+        saveDatabase();
+
+        renderAll();
+
+    }
+
+
+    /*
+     * =====================================================
+     * ВИДАЛЕННЯ ВИКЛАДАЧА
+     * =====================================================
+     */
+
+    function deleteTeacher(id) {
+
+        /*
+         * Перевіряємо, чи використовується
+         * викладач у таблиці предметів.
+         */
+
+        const used =
+            database.subjects.some(
+                function(subject) {
+
+                    return subject.teacherId === id;
+
+                }
+            );
+
+
+        if (used) {
+
+            showMessage(
+                "Видалення неможливе",
+                "Цей викладач використовується у таблиці «Предмети». Спочатку змініть викладача для відповідного предмета."
+            );
+
+            return;
+
+        }
+
+
+        database.teachers =
+            database.teachers.filter(
+                function(teacher) {
+                    return teacher.id !== id;
+                }
+            );
+
+
+        saveDatabase();
+
+        renderAll();
+
+    }
+
+
+    /*
+     * =====================================================
+     * РЕДАГУВАННЯ
+     * =====================================================
+     */
+
+    function editCell(
+        cell,
+        tableName,
+        field
+    ) {
+
+        if (
+            cell.querySelector("input")
+        ) {
+            return;
+        }
+
+
+        const oldValue =
+            cell.textContent.trim();
+
+
+        const input =
+            document.createElement(
+                "input"
+            );
+
+
+        input.type = "text";
+
+        input.value =
+            oldValue;
+
+        input.className =
+            "edit-input";
+
+
+        cell.textContent = "";
+
+        cell.appendChild(input);
+
+        input.focus();
+
+        input.select();
+
+
+        let saved = false;
+
+
+        function save() {
+
+            if (saved) {
+                return;
+            }
+
+
+            saved = true;
+
+
+            const newValue =
+                input.value.trim();
+
+
+            if (
+                newValue === ""
+            ) {
+
+                cell.textContent =
+                    oldValue;
+
+                return;
+
+            }
+
+
+            const id =
+                Number(
+                    cell.parentElement.dataset.id
+                );
+
+
+            const item =
+                database[tableName].find(
+                    function(item) {
+
+                        return item.id === id;
+
+                    }
+                );
+
+
+            if (!item) {
+
+                cell.textContent =
+                    oldValue;
+
+                return;
+
+            }
+
+
+            /*
+             * Перетворення числових полів.
+             */
+
+            if (
+                tableName === "students" &&
+                (
+                    field === "course" ||
+                    field === "average"
+                )
+            ) {
+
+                item[field] =
+                    Number(newValue);
+
+            }
+
+            else if (
+                tableName === "teachers" &&
+                (
+                    field === "experience" ||
+                    field === "rate"
+                )
+            ) {
+
+                item[field] =
+                    Number(
+                        newValue
+                            .replace("років", "")
+                            .trim()
+                    );
+
+            }
+
+            else {
+
+                item[field] =
+                    newValue;
+
+            }
+
+
+            saveDatabase();
+
+            renderAll();
+
+        }
+
+
+        input.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    save();
+
+                }
+
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    saved = true;
+
+                    cell.textContent =
+                        oldValue;
+
+                }
+
+            }
+        );
+
+
+        input.addEventListener(
+            "blur",
+            function() {
+
+                save();
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * POPUP
+     * =====================================================
+     */
+
+    function showMessage(
+        title,
+        message
+    ) {
+
+        document
+            .getElementById(
+                "messageTitle"
+            )
+            .textContent = title;
+
+
+        document
+            .getElementById(
+                "messageText"
+            )
+            .textContent = message;
+
+
+        document
+            .getElementById(
+                "messageModal"
+            )
+            .classList.add("active");
+
+    }
+
+
+    function closeMessage() {
+
+        document
+            .getElementById(
+                "messageModal"
+            )
+            .classList.remove("active");
+
+    }
+
+
+    /*
+     * =====================================================
+     * ЗАХИСТ ВІД HTML
+     * =====================================================
+     */
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    /*
+     * =====================================================
+     * ЗАПУСК ПРОГРАМИ
+     * =====================================================
+     */
+
+    loadDatabase();
+
+    renderAll();
+
+
+</script>
+
+</body>
+
+</html>
+```
